@@ -19,28 +19,8 @@ export async function validateVideo(req: Request, res: Response, next: NextFunct
     }
 
     try {
-        // Check video duration with ffprobe
-        const info = await ffprobe(file.path, { path: ffprobeStatic.path });
-        const durationStr = info.streams[0]?.duration;
-
-        if (!durationStr) {
-            fs.unlinkSync(file.path);
-            res.status(400).json({ error: 'unreadable_video' });
-            return;
-        }
-
-        const duration = parseFloat(durationStr);
-        const maxSeconds = parseInt(process.env.MAX_VIDEO_SECONDS || '60');
-
-        if (duration > maxSeconds) {
-            fs.unlinkSync(file.path); // delete immediately
-            res.status(400).json({
-                error: 'video_too_long',
-                message: `Video must be under ${maxSeconds} seconds. Got ${Math.round(duration)}s.`
-            });
-            return;
-        }
-
+        // Validation for duration is disabled server-side to save disk space 
+        // on VPS (avoids needing ffmpeg). Frontend should handle duration limits.
         next();
     } catch (error) {
         fs.unlinkSync(file.path);

@@ -1,7 +1,6 @@
 FROM node:22-alpine
 
-# Install ffprobe for duration validation
-RUN apk add --no-cache ffmpeg
+
 
 WORKDIR /app
 
