@@ -11,24 +11,24 @@ export function DemoPreview() {
     const totalScore = Math.round(metrics.reduce((s, m) => s + m.score, 0) / metrics.length);
 
     return (
-        <section id="demo" className="bg-zinc-950 px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
+        <section id="demo" className="bg-zinc-100 dark:bg-zinc-950 px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
             <div className="mx-auto w-full max-w-4xl">
                 <div className="mb-12 text-center sm:mb-14">
                     <span className="bg-gradient-to-br from-indigo-500 to-sky-500 bg-clip-text text-xs font-bold tracking-[0.1em] text-transparent sm:text-[13px]">
                         SEE IT IN ACTION
                     </span>
-                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-4xl lg:text-5xl">
                         What your report looks like
                     </h2>
-                    <p className="mt-4 text-base leading-7 text-zinc-400 sm:text-[17px]">
+                    <p className="mt-4 text-base leading-7 text-zinc-600 dark:text-zinc-400 sm:text-[17px]">
                         Every analysis gives you a detailed breakdown of your form across key metrics
                     </p>
                 </div>
 
                 {/* Demo Card */}
-                <div className="overflow-hidden rounded-3xl border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
+                <div className="overflow-hidden rounded-3xl border border-zinc-200 dark:border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.1)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.4)]">
                     {/* Header */}
-                    <div className="relative flex flex-col gap-6 bg-gradient-to-br from-indigo-950 to-sky-900 px-6 py-8 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+                    <div className="relative flex flex-col gap-6 bg-gradient-to-br from-indigo-600 to-sky-600 dark:from-indigo-950 dark:to-sky-900 px-6 py-8 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
                         <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.25),transparent)]" />
                         <div className="relative">
                             <div className="mb-2 flex items-center gap-2">
@@ -58,17 +58,17 @@ export function DemoPreview() {
                     </div>
 
                     {/* Metrics */}
-                    <div className="flex flex-col gap-4 bg-zinc-900/80 px-4 py-6 sm:px-6 lg:px-10 lg:py-7">
+                    <div className="flex flex-col gap-4 bg-white dark:bg-zinc-900/80 px-4 py-6 sm:px-6 lg:px-10 lg:py-7">
                         {metrics.map((item) => (
-                            <div key={item.category} className="rounded-xl border border-white/10 bg-zinc-800/60 p-4">
+                            <div key={item.category} className="rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-800/60 p-4">
                                 <div className="mb-2 flex items-center justify-between">
-                                    <span className="text-sm font-bold text-white">{item.category}</span>
+                                    <span className="text-sm font-bold text-zinc-900 dark:text-white">{item.category}</span>
                                     <div className="flex items-center gap-2">
                                         <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${item.badgeColor}`}>{item.status}</span>
-                                        <span className="text-lg font-extrabold text-white">{item.score}</span>
+                                        <span className="text-lg font-extrabold text-zinc-900 dark:text-white">{item.score}</span>
                                     </div>
                                 </div>
-                                <div className="h-1.5 overflow-hidden rounded-full bg-zinc-700">
+                                <div className="h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                                     <div style={{ width: `${item.score}%` }} className={`h-full rounded-full ${item.barColor}`} />
                                 </div>
                             </div>
@@ -76,7 +76,7 @@ export function DemoPreview() {
                     </div>
 
                     {/* CTA */}
-                    <div className="flex items-center justify-center border-t border-white/10 bg-zinc-900/60 px-4 py-5 sm:px-6 lg:px-10 lg:py-6">
+                    <div className="flex items-center justify-center border-t border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/60 px-4 py-5 sm:px-6 lg:px-10 lg:py-6">
                         <Link
                             href="/signup"
                             className="rounded-lg bg-gradient-to-br from-indigo-500 to-sky-500 px-6 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(99,102,241,0.35)] transition hover:-translate-y-0.5"

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navbar() {
     const { data: session } = useSession();
@@ -18,7 +19,7 @@ export function Navbar() {
     return (
         <nav
             className={`sticky top-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-300 lg:px-10 ${scrolled
-                ? "border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl"
+                ? "border-b border-zinc-200 dark:border-white/10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl"
                 : "bg-transparent"
                 }`}
         >
@@ -29,16 +30,16 @@ export function Navbar() {
                         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                     </svg>
                 </div>
-                <span className="text-xl font-extrabold tracking-[-0.04em] text-white">
-                    Form<span className="bg-gradient-to-br from-indigo-400 to-sky-400 bg-clip-text text-transparent">AI</span>
+                <span className="text-xl font-extrabold tracking-[-0.04em] text-zinc-900 dark:text-white">
+                    Form<span className="bg-gradient-to-br from-indigo-500 to-sky-500 dark:from-indigo-400 dark:to-sky-400 bg-clip-text text-transparent">AI</span>
                 </span>
             </Link>
 
             {/* Desktop links */}
-            <div className="hidden items-center gap-8 text-sm font-medium text-zinc-400 md:flex">
-                <a href="#features" className="transition hover:text-white">Features</a>
-                <a href="#how-it-works" className="transition hover:text-white">How it works</a>
-                <a href="#pricing" className="transition hover:text-white">Pricing</a>
+            <div className="hidden items-center gap-8 text-sm font-medium text-zinc-500 dark:text-zinc-400 md:flex">
+                <a href="#features" className="transition hover:text-zinc-900 dark:hover:text-white">Features</a>
+                <a href="#how-it-works" className="transition hover:text-zinc-900 dark:hover:text-white">How it works</a>
+                <a href="#pricing" className="transition hover:text-zinc-900 dark:hover:text-white">Pricing</a>
             </div>
 
             {/* Auth buttons */}
@@ -54,7 +55,7 @@ export function Navbar() {
                     <>
                         <Link
                             href="/login"
-                            className="px-4 py-2 text-sm font-semibold text-zinc-400 transition hover:text-white"
+                            className="px-4 py-2 text-sm font-semibold text-zinc-500 dark:text-zinc-400 transition hover:text-zinc-900 dark:hover:text-white"
                         >
                             Log in
                         </Link>
@@ -67,6 +68,11 @@ export function Navbar() {
                     </>
                 )}
             </div>
+
+            {/* Theme Toggle for Desktop */}
+            {/* <div className="hidden md:flex items-center ml-2 border-l border-zinc-200 dark:border-zinc-800 pl-4">
+                <ThemeToggle />
+            </div> */}
 
             {/* Mobile menu toggle */}
             <button
@@ -92,17 +98,21 @@ export function Navbar() {
 
             {/* Mobile menu */}
             {menuOpen && (
-                <div className="absolute left-0 right-0 top-full border-b border-white/10 bg-zinc-900/95 px-6 py-5 backdrop-blur-xl md:hidden">
-                    <div className="flex flex-col gap-3">
-                        <a href="#features" className="text-sm font-medium text-zinc-300 hover:text-white" onClick={() => setMenuOpen(false)}>Features</a>
-                        <a href="#how-it-works" className="text-sm font-medium text-zinc-300 hover:text-white" onClick={() => setMenuOpen(false)}>How it works</a>
-                        <a href="#pricing" className="text-sm font-medium text-zinc-300 hover:text-white" onClick={() => setMenuOpen(false)}>Pricing</a>
-                        <div className="mt-2 flex flex-col gap-2 border-t border-white/10 pt-4">
+                <div className="absolute left-0 right-0 top-full border-b border-zinc-200 dark:border-white/10 bg-white/95 dark:bg-zinc-900/95 px-6 py-5 backdrop-blur-xl md:hidden">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                            <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Theme</span>
+                            <ThemeToggle />
+                        </div>
+                        <a href="#features" className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white" onClick={() => setMenuOpen(false)}>Features</a>
+                        <a href="#how-it-works" className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white" onClick={() => setMenuOpen(false)}>How it works</a>
+                        <a href="#pricing" className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white" onClick={() => setMenuOpen(false)}>Pricing</a>
+                        <div className="mt-2 flex flex-col gap-2 border-t border-zinc-200 dark:border-white/10 pt-4">
                             {session ? (
                                 <Link href="/dashboard" className="rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 px-5 py-2.5 text-center text-sm font-bold text-white">Dashboard</Link>
                             ) : (
                                 <>
-                                    <Link href="/login" className="text-center text-sm font-semibold text-zinc-400">Log in</Link>
+                                    <Link href="/login" className="text-center text-sm font-semibold text-zinc-500 dark:text-zinc-400">Log in</Link>
                                     <Link href="/signup" className="rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 px-5 py-2.5 text-center text-sm font-bold text-white">Get Started Free</Link>
                                 </>
                             )}

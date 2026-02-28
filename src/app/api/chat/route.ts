@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { auth } from "@/lib/auth";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new OpenAI({
+    apiKey: process.env.GROK_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY,
+    baseURL: process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1"
+});
 
 const SYSTEM_PROMPT = `You are FormAI Coach, an expert fitness and nutrition assistant. You are helpful, motivating, and knowledgeable about:
 
@@ -45,27 +48,25 @@ export async function POST(request: Request) {
             );
         }
 
-        // Build conversation contents for Gemini
-        const contents = [
-            { role: "user" as const, parts: [{ text: SYSTEM_PROMPT }] },
-            { role: "model" as const, parts: [{ text: "Understood! I'm FormAI Coach, ready to help with fitness and nutrition questions. How can I help you today? 💪" }] },
+        // Build conversation messages for OpenAI-compatible API
+        const messages = [
+            { role: "system" as const, content: SYSTEM_PROMPT },
+            { role: "assistant" as const, content: "Understood! I'm FormAI Coach, ready to help with fitness and nutrition questions. How can I help you today? 💪" },
             ...history.map((msg) => ({
-                role: msg.role === "user" ? ("user" as const) : ("model" as const),
-                parts: [{ text: msg.text }],
+                role: msg.role === "user" ? ("user" as const) : ("assistant" as const),
+                content: msg.text,
             })),
-            { role: "user" as const, parts: [{ text: message }] },
+            { role: "user" as const, content: message },
         ];
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents,
-            config: {
-                temperature: 0.7,
-                maxOutputTokens: 1024,
-            },
+        const response = await ai.chat.completions.create({
+            model: process.env.LLM_MODEL || "llama-3.3-70b-versatile",
+            messages,
+            temperature: 0.7,
+            max_tokens: 1024,
         });
 
-        const reply = response.text?.trim() ?? "Sorry, I couldn't process that. Please try again.";
+        const reply = response.choices[0]?.message?.content?.trim() ?? "Sorry, I couldn't process that. Please try again.";
 
         return NextResponse.json({ success: true, reply });
     } catch (error) {

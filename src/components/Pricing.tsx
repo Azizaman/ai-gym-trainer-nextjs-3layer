@@ -56,25 +56,25 @@ export function Pricing() {
     const [annual, setAnnual] = useState(false);
 
     return (
-        <section className="bg-zinc-950 px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
+        <section className="bg-zinc-50 dark:bg-zinc-950 px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
             <div className="mx-auto w-full max-w-6xl">
                 <div className="mb-12 text-center sm:mb-14">
                     <span className="bg-gradient-to-br from-indigo-500 to-sky-500 bg-clip-text text-xs font-bold tracking-[0.1em] text-transparent sm:text-[13px]">
                         PRICING
                     </span>
-                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-4xl lg:text-5xl">
                         Simple, honest pricing
                     </h2>
-                    <p className="mt-3 text-base text-zinc-400">Start free. Upgrade when you&apos;re ready.</p>
+                    <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">Start free. Upgrade when you&apos;re ready.</p>
 
-                    <div className="mt-6 inline-flex items-center gap-1 rounded-xl bg-zinc-800/80 p-1">
+                    <div className="mt-6 inline-flex items-center gap-1 rounded-xl bg-zinc-200/80 dark:bg-zinc-800/80 p-1">
                         {["Monthly", "Annual"].map((label, index) => {
                             const selected = annual === (index === 1);
                             return (
                                 <button
                                     key={label}
                                     onClick={() => setAnnual(index === 1)}
-                                    className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition sm:px-5 ${selected ? "bg-zinc-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.3)]" : "text-zinc-500"
+                                    className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold transition sm:px-5 ${selected ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]" : "text-zinc-500"
                                         }`}
                                 >
                                     {label}
@@ -96,8 +96,8 @@ export function Pricing() {
                             <article
                                 key={plan.name}
                                 className={`relative rounded-3xl p-8 transition duration-200 lg:p-9 ${plan.popular
-                                    ? "bg-gradient-to-br from-indigo-950 to-sky-900 text-white shadow-[0_24px_64px_rgba(99,102,241,0.3)] xl:scale-[1.03]"
-                                    : "border border-white/10 bg-zinc-900/60 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)]"
+                                    ? "bg-gradient-to-br from-indigo-500 to-sky-600 dark:from-indigo-950 dark:to-sky-900 text-white shadow-[0_24px_64px_rgba(99,102,241,0.2)] dark:shadow-[0_24px_64px_rgba(99,102,241,0.3)] xl:scale-[1.03]"
+                                    : "border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900/60 hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)]"
                                     }`}
                             >
                                 {plan.popular ? (
@@ -110,13 +110,13 @@ export function Pricing() {
                                     <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${plan.popular ? "bg-white/15" : plan.iconBgClass}`}>
                                         <div className={`h-4 w-4 rounded-full ${plan.dotClass}`} />
                                     </div>
-                                    <span className="text-lg font-extrabold tracking-[-0.02em] text-white">
+                                    <span className={`text-lg font-extrabold tracking-[-0.02em] ${plan.popular ? "text-white" : "text-zinc-900 dark:text-white"}`}>
                                         {plan.name}
                                     </span>
                                 </div>
 
                                 <div className="mb-1">
-                                    <span className="text-5xl font-extrabold tracking-[-0.05em] leading-none text-white">
+                                    <span className={`text-5xl font-extrabold tracking-[-0.05em] leading-none ${plan.popular ? "text-white" : "text-zinc-900 dark:text-white"}`}>
                                         {price === 0 ? "Free" : `$${price}`}
                                     </span>
                                     {price > 0 ? (
@@ -135,7 +135,7 @@ export function Pricing() {
                                     {cta}
                                 </Link>
 
-                                <div className={`my-7 h-px ${plan.popular ? "bg-white/15" : "bg-white/10"}`} />
+                                <div className={`my-7 h-px ${plan.popular ? "bg-white/15 dark:bg-white/15" : "bg-zinc-200 dark:bg-white/10"}`} />
 
                                 <ul className="flex list-none flex-col gap-3">
                                     {plan.features.map((feature) => (
@@ -151,7 +151,7 @@ export function Pricing() {
                                                     />
                                                 </svg>
                                             </div>
-                                            <span className={`text-sm leading-6 ${plan.popular ? "text-white/80" : "text-zinc-400"}`}>{feature}</span>
+                                            <span className={`text-sm leading-6 ${plan.popular ? "text-white/90 dark:text-white/80" : "text-zinc-600 dark:text-zinc-400"}`}>{feature}</span>
                                         </li>
                                     ))}
                                 </ul>

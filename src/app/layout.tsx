@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
 export const metadata: Metadata = {
   title: "FormAI — AI-Powered Workout Form Analyzer",
   description:
@@ -14,9 +16,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <SessionProvider>{children}</SessionProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-background text-foreground">
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+          >
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

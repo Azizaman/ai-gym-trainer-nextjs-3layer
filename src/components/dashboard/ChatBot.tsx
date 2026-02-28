@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles, Trash2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
     id: string;
@@ -95,25 +97,17 @@ export function ChatBot() {
         setMessages([]);
     };
 
-    // Simple markdown-like rendering for bot messages
-    const renderText = (text: string) => {
-        return text.split("\n").map((line, i) => {
-            // Bold
-            const boldedLine = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-            // Bullet points
-            if (line.startsWith("- ") || line.startsWith("* ")) {
-                return (
-                    <div key={i} className="ml-3 flex gap-2 py-0.5">
-                        <span className="mt-1.5 h-1.5 w-1.5 flex-none rounded-full bg-indigo-400" />
-                        <span dangerouslySetInnerHTML={{ __html: boldedLine.slice(2) }} />
-                    </div>
-                );
-            }
-            if (line.trim() === "") return <br key={i} />;
-            return (
-                <p key={i} className="py-0.5" dangerouslySetInnerHTML={{ __html: boldedLine }} />
-            );
-        });
+    // Custom components for ReactMarkdown to match styling
+    const MarkdownComponents = {
+        h1: ({ ...props }) => <h1 className="mt-2 mb-1 text-lg font-bold" {...props} />,
+        h2: ({ ...props }) => <h2 className="mt-2 mb-1 text-base font-bold" {...props} />,
+        h3: ({ ...props }) => <h3 className="mt-2 mb-1 text-sm font-bold" {...props} />,
+        p: ({ ...props }) => <p className="py-1" {...props} />,
+        ul: ({ ...props }) => <ul className="ml-4 list-disc space-y-1 py-1" {...props} />,
+        ol: ({ ...props }) => <ol className="ml-4 list-decimal space-y-1 py-1" {...props} />,
+        li: ({ ...props }) => <li className="pl-1" {...props} />,
+        strong: ({ ...props }) => <strong className="font-semibold text-white" {...props} />,
+        a: ({ ...props }) => <a className="text-indigo-400 underline hover:text-indigo-300" target="_blank" rel="noopener noreferrer" {...props} />,
     };
 
     return (
@@ -122,8 +116,8 @@ export function ChatBot() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-2xl shadow-[0_8px_32px_rgba(99,102,241,0.4)] transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_40px_rgba(99,102,241,0.5)] ${isOpen
-                        ? "rotate-0 bg-slate-800"
-                        : "bg-gradient-to-br from-indigo-500 to-sky-500"
+                    ? "rotate-0 bg-slate-800"
+                    : "bg-gradient-to-br from-indigo-500 to-sky-500"
                     }`}
             >
                 {isOpen ? (
@@ -136,8 +130,8 @@ export function ChatBot() {
             {/* Chat Panel */}
             <div
                 className={`fixed bottom-24 right-5 z-50 flex w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-[0_32px_96px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-300 sm:w-[400px] ${isOpen
-                        ? "pointer-events-auto translate-y-0 opacity-100"
-                        : "pointer-events-none translate-y-4 opacity-0"
+                    ? "pointer-events-auto translate-y-0 opacity-100"
+                    : "pointer-events-none translate-y-4 opacity-0"
                     }`}
                 style={{ height: "min(600px, calc(100vh - 8rem))" }}
             >
@@ -202,11 +196,22 @@ export function ChatBot() {
                                 )}
                                 <div
                                     className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${msg.role === "user"
-                                            ? "rounded-br-md bg-gradient-to-br from-indigo-500 to-sky-500 text-white"
-                                            : "rounded-bl-md border border-white/5 bg-white/[0.04] text-slate-200"
+                                        ? "rounded-br-md bg-gradient-to-br from-indigo-500 to-sky-500 text-white"
+                                        : "rounded-bl-md border border-white/5 bg-white/[0.04] text-slate-200"
                                         }`}
                                 >
-                                    {msg.role === "model" ? renderText(msg.text) : msg.text}
+                                    {msg.role === "model" ? (
+                                        <div className="prose prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none text-sm break-words">
+                                            <ReactMarkdown
+                                                remarkPlugins={[remarkGfm]}
+                                                components={MarkdownComponents as any}
+                                            >
+                                                {msg.text}
+                                            </ReactMarkdown>
+                                        </div>
+                                    ) : (
+                                        msg.text
+                                    )}
                                 </div>
                                 {msg.role === "user" && (
                                     <div className="mt-1 flex h-7 w-7 flex-none items-center justify-center rounded-lg bg-slate-800">

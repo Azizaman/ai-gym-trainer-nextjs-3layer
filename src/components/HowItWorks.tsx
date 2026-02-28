@@ -7,13 +7,13 @@ const STEPS = [
 
 export function HowItWorks() {
     return (
-        <section className="bg-zinc-950 px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
+        <section className="bg-background px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
             <div className="mx-auto w-full max-w-6xl">
                 <div className="mb-14 text-center sm:mb-16 lg:mb-18">
                     <span className="bg-gradient-to-br from-indigo-500 to-sky-500 bg-clip-text text-xs font-bold tracking-[0.1em] text-transparent sm:text-[13px]">
                         HOW IT WORKS
                     </span>
-                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+                    <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-4xl lg:text-5xl">
                         From upload to insight
                         <br />
                         in under 30 seconds
@@ -25,12 +25,12 @@ export function HowItWorks() {
 
                     {STEPS.map((step) => (
                         <article key={step.n} className="relative z-10 flex flex-col items-center px-2 text-center lg:px-5">
-                            <div className={`mb-7 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-zinc-900 text-2xl ${step.color}`}>
+                            <div className={`mb-7 flex h-14 w-14 items-center justify-center rounded-full border-[3px] border-white dark:border-zinc-900 text-2xl ${step.color}`}>
                                 {step.icon}
                             </div>
-                            <p className="mb-2 text-xs font-bold tracking-[0.1em] text-zinc-600">STEP {step.n}</p>
-                            <h3 className="mb-2.5 text-base font-bold tracking-[-0.02em] text-white sm:text-[17px]">{step.title}</h3>
-                            <p className="text-sm leading-7 text-zinc-400">{step.desc}</p>
+                            <p className="mb-2 text-xs font-bold tracking-[0.1em] text-zinc-500 dark:text-zinc-600">STEP {step.n}</p>
+                            <h3 className="mb-2.5 text-base font-bold tracking-[-0.02em] text-zinc-900 dark:text-white sm:text-[17px]">{step.title}</h3>
+                            <p className="text-sm leading-7 text-zinc-600 dark:text-zinc-400">{step.desc}</p>
                         </article>
                     ))}
                 </div>

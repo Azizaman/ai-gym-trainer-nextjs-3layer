@@ -19,7 +19,7 @@ export function Hero() {
                 </div>
 
                 {/* Headline */}
-                <h1 className="animate-fade-up text-4xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white sm:text-5xl lg:text-7xl [animation-delay:50ms]">
+                <h1 className="animate-fade-up text-4xl font-extrabold leading-[1.1] tracking-[-0.04em] text-zinc-900 dark:text-white sm:text-5xl lg:text-7xl [animation-delay:50ms]">
                     Your personal AI trainer{" "}
                     <span className="relative whitespace-nowrap font-['Outfit'] italic text-indigo-400">
                         that never misses a rep.
@@ -38,7 +38,7 @@ export function Hero() {
                     </span>
                 </h1>
 
-                <p className="animate-fade-up mx-auto mt-6 max-w-2xl text-base leading-8 text-zinc-400 sm:text-lg [animation-delay:100ms]">
+                <p className="animate-fade-up mx-auto mt-6 max-w-2xl text-base leading-8 text-zinc-600 dark:text-zinc-400 sm:text-lg [animation-delay:100ms]">
                     Upload any workout video and get instant, expert-level biomechanical feedback. Fix your form, prevent injuries, hit new PRs.
                 </p>
 
@@ -55,7 +55,7 @@ export function Hero() {
                     </Link>
                     <a
                         href="#demo"
-                        className="inline-flex items-center gap-2 rounded-xl border-2 border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-zinc-300 transition hover:border-white/30 hover:bg-white/10 sm:text-base"
+                        className="inline-flex items-center gap-2 rounded-xl border-2 border-zinc-200 dark:border-white/15 bg-zinc-50 dark:bg-white/5 px-6 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-300 dark:hover:border-white/30 hover:bg-zinc-100 dark:hover:bg-white/10 sm:text-base"
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-zinc-500">
                             <polygon points="5 3 19 12 5 21 5 3" />
@@ -74,14 +74,14 @@ export function Hero() {
                                 </div>
                             ))}
                         </div>
-                        <span className="font-semibold text-zinc-400">
-                            <strong className="text-white">50,000+</strong> athletes trust FormAI
+                        <span className="font-semibold text-zinc-600 dark:text-zinc-400">
+                            <strong className="text-zinc-900 dark:text-white">50,000+</strong> athletes trust FormAI
                         </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="text-amber-500">★</span>
-                        <span className="font-semibold text-zinc-400">
-                            <strong className="text-white">4.9/5</strong> on App Store
+                        <span className="font-semibold text-zinc-600 dark:text-zinc-400">
+                            <strong className="text-zinc-900 dark:text-white">4.9/5</strong> on App Store
                         </span>
                     </div>
                 </div>
@@ -95,8 +95,8 @@ export function Hero() {
                         { value: "98.2%", label: "AI accuracy" },
                     ].map((stat) => (
                         <div key={stat.label}>
-                            <p className="text-2xl font-extrabold tracking-[-0.03em] text-white sm:text-3xl">{stat.value}</p>
-                            <p className="mt-0.5 text-xs text-zinc-500">{stat.label}</p>
+                            <p className="text-2xl font-extrabold tracking-[-0.03em] text-zinc-900 dark:text-white sm:text-3xl">{stat.value}</p>
+                            <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-500">{stat.label}</p>
                         </div>
                     ))}
                 </div>
