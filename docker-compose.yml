@@ -8,8 +8,6 @@ services:
     volumes:
       - /tmp/uploads:/tmp/uploads
     depends_on:
-      redis:
-        condition: service_started
       vision-service:
         condition: service_started
     env_file: .env
@@ -29,7 +27,3 @@ services:
     #           capabilities: [gpu]
     #           count: 1
 
-  redis:
-    image: redis:7-alpine
-    expose:
-      - "6379"
