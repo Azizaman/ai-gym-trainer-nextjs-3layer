@@ -27,7 +27,7 @@ export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
         pricing: { INR: 0, USD: 0 },
         analysesPerMonth: 3,
         maxVideoSizeMB: 25,
-        allowedExercises: ["squat", "deadlift", "bench-press", "push-up", "plank"],
+        allowedExercises: ["squat", "deadlift", "bench-press", "push-up", "plank", "bicep-curl", "shoulder-press", "tricep-pushdown"],
         features: {
             fullReport: false,
             maxHistoryVisible: 5,

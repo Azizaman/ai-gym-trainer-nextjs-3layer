@@ -28,7 +28,10 @@ export async function GET() {
             });
         }
 
-        const plan = subscription.plan as PlanType;
+        let plan = (subscription.plan || "starter").toLowerCase().trim() as PlanType;
+        if (!PLAN_LIMITS[plan]) {
+            plan = "starter";
+        }
 
         // Auto-reset usage if new billing period
         if (shouldResetUsage(subscription.currentPeriodStart)) {

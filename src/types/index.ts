@@ -3,6 +3,9 @@ export interface ExerciseFeedback {
   score: number; // 0–100
   exerciseDetected: string;
   repCount: number | null;
+  overallTier?: string;
+  muscleGroupsTargeted?: string[];
+  estimatedCalorieBurn?: number;
   goodPoints: string[];
   issues: FormIssue[];
   corrections: string[];

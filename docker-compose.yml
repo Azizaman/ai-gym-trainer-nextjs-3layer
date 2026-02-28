@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  node-api:
+    build: ./node
+    ports:
+      - "3001:3000"
+    volumes:
+      - /tmp/uploads:/tmp/uploads
+    depends_on:
+      redis:
+        condition: service_started
+      vision-service:
+        condition: service_started
+    env_file: .env
+
+  vision-service:
+    build: ./vision
+    expose:
+      - "5000"
+    volumes:
+      - /tmp/uploads:/tmp/uploads:ro
+    # Optional GPU acceleration if NVIDIA drivers are configured on host
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           capabilities: [gpu]
+    #           count: 1
+
+  redis:
+    image: redis:7-alpine
+    expose:
+      - "6379"

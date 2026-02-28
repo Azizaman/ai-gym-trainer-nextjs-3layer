@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { analyzeExerciseVideo } from "@/lib/gemini";
 import { config } from "@/lib/config";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, isExerciseAllowed, shouldResetUsage, getRemainingAnalyses } from "@/lib/plans";
 import type { PlanType } from "@/lib/plans";
+
+// Allow long-running analysis polling up to 5 minutes
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
     try {
@@ -28,7 +30,10 @@ export async function POST(request: Request) {
             });
         }
 
-        const plan = subscription.plan as PlanType;
+        let plan = (subscription.plan || "starter").toLowerCase().trim() as PlanType;
+        if (!PLAN_LIMITS[plan]) {
+            plan = "starter";
+        }
         const limits = PLAN_LIMITS[plan];
 
         // Auto-reset usage if new billing period
@@ -102,14 +107,82 @@ export async function POST(request: Request) {
             );
         }
 
-        // Read file into buffer
-        const arrayBuffer = await video.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+        // 1. Submit to Node Worker
+        const nodeApiUrl = process.env.NODE_API_URL || "http://127.0.0.1:3001";
+        const nodeFormData = new FormData();
+        nodeFormData.append("video", video);
+        nodeFormData.append("exercise", exerciseType);
+        nodeFormData.append("userId", session.user.id);
 
-        // Run analysis
-        const feedback = await analyzeExerciseVideo(buffer, video.type, exerciseType, {
-            fitnessLevel: fitnessLevel as "beginner" | "intermediate" | "advanced",
+        const uploadRes = await fetch(`${nodeApiUrl}/api/analyze-workout`, {
+            method: "POST",
+            body: nodeFormData,
         });
+
+        if (!uploadRes.ok) {
+            throw new Error(`Worker upload failed: ${uploadRes.statusText}`);
+        }
+
+        const uploadData = await uploadRes.json();
+        const jobId = uploadData.jobId;
+
+        // 2. Poll until complete
+        const MAX_WAIT_MS = 5 * 60 * 1000;
+        const POLL_INTERVAL_MS = 3000;
+        const start = Date.now();
+        let jobResult: any = null;
+
+        while (Date.now() - start < MAX_WAIT_MS) {
+            const pollRes = await fetch(`${nodeApiUrl}/api/job/${jobId}/result`);
+
+            if (pollRes.status === 200) {
+                jobResult = await pollRes.json();
+                break;
+            } else if (pollRes.status === 202) {
+                await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+            } else if (pollRes.status === 500) {
+                const errData = await pollRes.json();
+                throw new Error(errData.error || "Analysis job failed");
+            } else {
+                throw new Error(`Unexpected polling status: ${pollRes.status}`);
+            }
+        }
+
+        if (!jobResult) {
+            throw new Error("Timed out waiting for analysis to complete.");
+        }
+
+        // 3. Map to ExerciseFeedback
+        // coach_feedback should now contain the exact JSON string we need from the LLM.
+        let feedback: any;
+        try {
+            feedback = JSON.parse(jobResult.coach_feedback);
+            // Just in case LLM missed these fields
+            if (!feedback.summary) feedback.summary = "Analysis complete.";
+            if (typeof feedback.isFormCorrect !== 'boolean') feedback.isFormCorrect = feedback.score >= 80;
+        } catch (e) {
+            console.error("Failed to parse coach feedback:", e);
+            // Fallback mapping if LLM failed to return valid JSON
+            const report = jobResult.analysis_report || {};
+            const score = report.form_score || 0;
+
+            feedback = {
+                score: score,
+                isFormCorrect: score >= 80,
+                exerciseDetected: exerciseType,
+                repCount: report.reps || null,
+                summary: jobResult.coach_feedback || "Analysis complete.",
+                goodPoints: [],
+                issues: (report.problems_detected || []).map((p: any) => ({
+                    severity: p.severity || "moderate",
+                    body_part: p.body_part || "body",
+                    description: p.issue || p.description || "Form issue detected"
+                })),
+                corrections: [],
+                safetyWarnings: [],
+                recommendedDrills: []
+            };
+        }
 
         // Save to database & increment usage
         try {
@@ -120,14 +193,14 @@ export async function POST(request: Request) {
                     fitnessLevel,
                     score: feedback.score,
                     isFormCorrect: feedback.isFormCorrect,
-                    exerciseDetected: feedback.exerciseDetected || exerciseType,
+                    exerciseDetected: feedback.exerciseDetected,
                     repCount: feedback.repCount || null,
-                    summary: feedback.summary || "",
-                    goodPoints: JSON.stringify(feedback.goodPoints || []),
-                    issues: JSON.stringify(feedback.issues || []),
-                    corrections: JSON.stringify(feedback.corrections || []),
-                    safetyWarnings: JSON.stringify(feedback.safetyWarnings || []),
-                    recommendedDrills: JSON.stringify(feedback.recommendedDrills || []),
+                    summary: feedback.summary,
+                    goodPoints: JSON.stringify(feedback.goodPoints),
+                    issues: JSON.stringify(feedback.issues),
+                    corrections: JSON.stringify(feedback.corrections),
+                    safetyWarnings: JSON.stringify(feedback.safetyWarnings),
+                    recommendedDrills: JSON.stringify(feedback.recommendedDrills),
                     fileSizeMB: video.size / 1024 / 1024,
                 },
             });
