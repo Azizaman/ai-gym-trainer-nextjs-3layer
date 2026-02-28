@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  web-app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      node-api:
+        condition: service_started
+    env_file: .env
+
   node-api:
     build: ./node
     ports:
