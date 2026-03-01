@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { auth } from "@/lib/auth";
 
 const ai = new OpenAI({
-    apiKey: process.env.GROK_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY,
+    apiKey: process.env.GROK_API_KEY || process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || "dummy_key_for_build",
     baseURL: process.env.LLM_BASE_URL || "https://api.groq.com/openai/v1"
 });
 
