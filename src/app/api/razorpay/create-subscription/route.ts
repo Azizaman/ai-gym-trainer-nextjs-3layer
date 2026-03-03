@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { razorpay, getRazorpayPlanId } from "@/lib/razorpay";
+import { getRazorpay, getRazorpayPlanId } from "@/lib/razorpay";
 import type { PlanType } from "@/lib/plans";
 
 export async function POST(request: Request) {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         }
 
         // Create Razorpay Subscription
-        const subscription = await razorpay.subscriptions.create({
+        const subscription = await getRazorpay().subscriptions.create({
             plan_id: planId,
             total_count: 12, // 12 billing cycles (1 year max)
             quantity: 1,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, shouldResetUsage, getRemainingAnalyses } from "@/lib/plans";
-import { razorpay } from "@/lib/razorpay";
+import { getRazorpay } from "@/lib/razorpay";
 import type { PlanType } from "@/lib/plans";
 
 /** GET — Return current subscription, usage, and limits */
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         // Cancel active Razorpay subscription if exists
         if (subscription.razorpaySubscriptionId) {
             try {
-                await razorpay.subscriptions.cancel(subscription.razorpaySubscriptionId);
+                await getRazorpay().subscriptions.cancel(subscription.razorpaySubscriptionId);
             } catch (err) {
                 console.warn("Failed to cancel Razorpay subscription (may already be cancelled):", err);
             }
