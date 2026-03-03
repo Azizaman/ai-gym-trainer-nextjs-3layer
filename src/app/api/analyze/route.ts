@@ -108,7 +108,7 @@ export async function POST(request: Request) {
         }
 
         // 1. Submit to Node Worker
-        const nodeApiUrl = process.env.NODE_API_URL || "http://127.0.0.1:3001";
+        const nodeApiUrl = process.env.NODE_API_URL || "http://node-api:3000";
         const nodeFormData = new FormData();
         nodeFormData.append("video", video);
         nodeFormData.append("exercise", exerciseType);

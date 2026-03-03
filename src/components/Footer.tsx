@@ -2,7 +2,7 @@ const COLUMNS = [
     { title: "Product", links: [{ label: "Features", href: "#" }, { label: "How It Works", href: "#" }, { label: "Pricing", href: "#" }, { label: "Changelog", href: "#" }, { label: "Roadmap", href: "#" }] },
     { title: "Company", links: [{ label: "About", href: "#" }, { label: "Blog", href: "#" }, { label: "Careers", href: "#" }, { label: "Press", href: "#" }, { label: "Contact", href: "mailto:support@formai.example.com" }] },
     { title: "Resources", links: [{ label: "Documentation", href: "#" }, { label: "API Reference", href: "#" }, { label: "Status", href: "#" }, { label: "Security", href: "#" }] },
-    { title: "Legal", links: [{ label: "Privacy Policy", href: "#" }, { label: "Terms of Service", href: "#" }, { label: "Cookie Policy", href: "#" }] },
+    { title: "Legal", links: [{ label: "Privacy Policy", href: "/privacy-policy" }, { label: "Terms of Service", href: "/terms-and-conditions" }, { label: "Refund Policy", href: "/refund-policy" }] },
 ];
 
 export function Footer() {
@@ -63,3 +63,4 @@ export function Footer() {
         </footer>
     );
 }
+
