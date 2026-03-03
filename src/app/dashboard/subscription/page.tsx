@@ -212,10 +212,34 @@ export default function SubscriptionPage() {
                     backdrop_color: "rgba(0, 0, 0, 0.7)",
                 },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                handler: function (response: any) {
+                handler: async function (response: any) {
                     console.log("Payment successful:", response);
-                    showToast("Payment successful! Your plan will be activated shortly.", "success");
-                    setTimeout(() => fetchSubscription(), 3000);
+                    showToast("Verifying payment...", "success");
+
+                    // Verify payment and activate subscription on the server
+                    try {
+                        const verifyRes = await fetch("/api/razorpay/verify-payment", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_subscription_id: response.razorpay_subscription_id,
+                                razorpay_signature: response.razorpay_signature,
+                                plan,
+                            }),
+                        });
+                        const verifyData = await verifyRes.json();
+
+                        if (verifyData.success) {
+                            showToast("Plan activated successfully! 🎉", "success");
+                        } else {
+                            showToast("Payment received but activation delayed. Please refresh.", "error");
+                        }
+                    } catch {
+                        showToast("Payment received but activation delayed. Please refresh.", "error");
+                    }
+
+                    fetchSubscription();
                 },
                 modal: {
                     ondismiss: function () {
