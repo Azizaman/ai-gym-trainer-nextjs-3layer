@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PLAN_LIMITS, shouldResetUsage, getRemainingAnalyses } from "@/lib/plans";
-import { paddle } from "@/lib/paddle";
+import { razorpay } from "@/lib/razorpay";
 import type { PlanType } from "@/lib/plans";
 
 /** GET — Return current subscription, usage, and limits */
@@ -54,7 +54,7 @@ export async function GET() {
                 planName: limits.name,
                 status: subscription.status,
                 currency: subscription.currency || "INR",
-                hasActivePaddle: !!subscription.paddleSubscriptionId,
+                hasActiveSubscription: !!subscription.razorpaySubscriptionId,
                 usage: {
                     used: subscription.analysesUsedThisMonth,
                     limit: limits.analysesPerMonth,
@@ -78,7 +78,7 @@ export async function GET() {
     }
 }
 
-/** POST — Downgrade to starter (cancels Paddle sub) or upgrade initiation */
+/** POST — Downgrade to starter (cancels Razorpay sub) or upgrade initiation */
 export async function POST(request: Request) {
     try {
         const session = await auth();
@@ -89,7 +89,6 @@ export async function POST(request: Request) {
         const { plan } = await request.json();
 
         // Only allow downgrade to starter via this endpoint
-        // Upgrades to paid plans must go through checkout
         if (plan !== "starter") {
             return NextResponse.json(
                 {
@@ -111,14 +110,12 @@ export async function POST(request: Request) {
             );
         }
 
-        // Cancel active Paddle subscription if exists
-        if (subscription.paddleSubscriptionId) {
+        // Cancel active Razorpay subscription if exists
+        if (subscription.razorpaySubscriptionId) {
             try {
-                await paddle.subscriptions.cancel(subscription.paddleSubscriptionId, {
-                    effectiveFrom: "immediately",
-                });
+                await razorpay.subscriptions.cancel(subscription.razorpaySubscriptionId);
             } catch (err) {
-                console.warn("Failed to cancel Paddle subscription (may already be cancelled):", err);
+                console.warn("Failed to cancel Razorpay subscription (may already be cancelled):", err);
             }
         }
 
@@ -128,9 +125,9 @@ export async function POST(request: Request) {
             data: {
                 plan: "starter",
                 status: "active",
-                paddleSubscriptionId: null,
-                paddleCustomerId: null,
-                paddlePriceId: null,
+                razorpaySubscriptionId: null,
+                razorpayCustomerId: null,
+                razorpayPlanId: null,
                 analysesUsedThisMonth: 0,
                 currentPeriodStart: new Date(),
                 currentPeriodEnd: null,

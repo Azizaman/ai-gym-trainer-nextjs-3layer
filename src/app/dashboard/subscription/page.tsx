@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Crown, Zap, Users, Check, Loader2, ArrowRight, Sparkles, AlertCircle } from "lucide-react";
-import { initializePaddle, Paddle } from "@paddle/paddle-js";
+import Script from "next/script";
 
 type PlanType = "starter" | "pro" | "team";
 type Currency = "INR" | "USD";
@@ -12,7 +12,7 @@ interface SubscriptionData {
     planName: string;
     status: string;
     currency: Currency;
-    hasActivePaddle: boolean;
+    hasActiveSubscription: boolean;
     usage: { used: number; limit: number; remaining: number };
     limits: {
         maxVideoSizeMB: number;
@@ -116,13 +116,20 @@ function detectCurrency(): Currency {
     }
 }
 
+declare global {
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Razorpay: any;
+    }
+}
+
 export default function SubscriptionPage() {
     const [sub, setSub] = useState<SubscriptionData | null>(null);
     const [loading, setLoading] = useState(true);
     const [upgrading, setUpgrading] = useState<PlanType | null>(null);
     const [currency, setCurrency] = useState<Currency>("INR");
     const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-    const [paddle, setPaddle] = useState<Paddle | null>(null);
+    const [razorpayReady, setRazorpayReady] = useState(false);
 
     const showToast = (message: string, type: "success" | "error") => {
         setToast({ message, type });
@@ -143,26 +150,9 @@ export default function SubscriptionPage() {
     useEffect(() => {
         setCurrency(detectCurrency());
         fetchSubscription();
+    }, [fetchSubscription]);
 
-        // Initialize Paddle
-        initializePaddle({
-            environment: process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT === "sandbox" ? "sandbox" : "production",
-            token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "test_client_token",
-            eventCallback: function (data) {
-                if (data.name === "checkout.completed") {
-                    showToast("Payment successful! Your plan will be activated shortly.", "success");
-                    paddle?.Checkout.close();
-                    setTimeout(() => fetchSubscription(), 3000);
-                }
-            }
-        }).then((paddleInstance) => {
-            if (paddleInstance) {
-                setPaddle(paddleInstance);
-            }
-        });
-    }, [fetchSubscription, paddle]);
-
-    /** Handle paid plan upgrade via Paddle Checkout */
+    /** Handle paid plan upgrade via Razorpay Checkout */
     const handleUpgrade = async (plan: PlanType) => {
         if (upgrading) return;
 
@@ -190,31 +180,60 @@ export default function SubscriptionPage() {
             return;
         }
 
-        if (!paddle) {
+        if (!razorpayReady || !window.Razorpay) {
             showToast("Payment system is still loading. Please try again in a moment.", "error");
             return;
         }
 
-        // Paid plan — redirect to Paddle checkout via our secure transaction API
+        // Paid plan — create Razorpay subscription via our API, then open checkout
         setUpgrading(plan);
         try {
-            const res = await fetch("/api/paddle/create-transaction", {
+            const res = await fetch("/api/razorpay/create-subscription", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan, currency }),
+                body: JSON.stringify({ plan }),
             });
             const data = await res.json();
 
-            if (!data.success || !data.data?.transactionId) {
+            if (!data.success || !data.data?.subscriptionId) {
                 showToast(data.error || "Failed to initiate payment", "error");
                 setUpgrading(null);
                 return;
             }
 
-            // Open Paddle Checkout modal
-            paddle.Checkout.open({
-                transactionId: data.data.transactionId
-            });
+            // Open Razorpay Checkout modal
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                subscription_id: data.data.subscriptionId,
+                name: "FormAI",
+                description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan - Monthly`,
+                theme: {
+                    color: "#6366f1",
+                    backdrop_color: "rgba(0, 0, 0, 0.7)",
+                },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                handler: function (response: any) {
+                    console.log("Payment successful:", response);
+                    showToast("Payment successful! Your plan will be activated shortly.", "success");
+                    setTimeout(() => fetchSubscription(), 3000);
+                },
+                modal: {
+                    ondismiss: function () {
+                        setUpgrading(null);
+                        showToast("Payment was cancelled.", "error");
+                    },
+                    confirm_close: true,
+                },
+                prefill: {
+                    email: "", // will be auto-filled by Razorpay if customer exists
+                },
+                notes: {
+                    plan,
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
         } catch {
             showToast("Failed to initiate payment. Please try again.", "error");
         } finally {
@@ -241,6 +260,12 @@ export default function SubscriptionPage() {
 
     return (
         <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+            {/* Load Razorpay Checkout.js */}
+            <Script
+                src="https://checkout.razorpay.com/v1/checkout.js"
+                onLoad={() => setRazorpayReady(true)}
+            />
+
             {/* Toast */}
             {toast && (
                 <div
@@ -471,16 +496,16 @@ export default function SubscriptionPage() {
 
             {/* Bottom note */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm font-medium text-slate-500">
-                {["🔒 SSL secured", "✅ No contracts", "↩️ 30-day refund", "🌍 Cancel anytime"].map(
+                {["🔒 SSL secured", "✅ No contracts", "↩️ 30-day refund", "🌍 International payments"].map(
                     (item) => (
                         <span key={item}>{item}</span>
                     )
                 )}
             </div>
 
-            {/* Paddle branding */}
+            {/* Razorpay branding */}
             <div className="mt-4 text-center text-xs text-slate-600">
-                Payments powered by Paddle
+                Payments powered by Razorpay · Supports UPI, Cards, NetBanking &amp; International payments
             </div>
         </div>
     );
