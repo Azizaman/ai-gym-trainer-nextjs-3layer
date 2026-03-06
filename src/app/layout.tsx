@@ -3,6 +3,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 export const metadata: Metadata = {
   title: "FormAI — AI-Powered Workout Form Analyzer",
@@ -17,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <GoogleAnalytics />
       <body className="bg-background text-foreground">
         <SessionProvider>
           <ThemeProvider
